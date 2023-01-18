@@ -25,7 +25,7 @@ jobs:
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
+        username: devopsifyme
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build the Docker image
@@ -35,7 +35,7 @@ jobs:
       if: github.event_name != 'pull_request'
       run: docker push devopsifyme/wslpipeproxy:${{ steps.version.outputs.version }}
 
-    - name: Push Latest Docker Image
+    - name: Tag Docker Image as latest
       if: github.ref == 'refs/heads/main'
       run: |
         docker tag devopsifyme/wslpipeproxy:${{ steps.version.outputs.version }} devopsifyme/wslpipeproxy:latest 
@@ -43,7 +43,9 @@ jobs:
 
     - name: Archive build output
       run: |
-        docker cp devopsifyme/wslpipeproxy:${{ steps.version.outputs.version }}:/install/ output/
+        docker create --name output devopsifyme/wslpipeproxy:${{ steps.version.outputs.version }}
+        docker cp output:/install/ output/
+        docker container rm output
         tar -czvf wslpipeproxy-${{ steps.version.outputs.version }}.tar.gz /output
 
     - name: Upload build output
