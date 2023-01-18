@@ -68,7 +68,10 @@ jobs:
     - name: Create Release
       #if: github.ref == 'refs/heads/main'
       uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         release_name: v${{ steps.gitversion.outputs.SemVer }}
         tag_name: ${{ steps.gitversion.outputs.SemVer }}
+        draft: true
 
