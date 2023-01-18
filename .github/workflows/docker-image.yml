@@ -46,7 +46,7 @@ jobs:
         docker create --name output devopsifyme/wslpipeproxy:${{ steps.version.outputs.version }}
         docker cp output:/install/ output/
         docker container rm output
-        tar -czvf wslpipeproxy-${{ steps.version.outputs.version }}.tar.gz /output
+        tar -czvf wslpipeproxy-${{ steps.version.outputs.version }}.tar.gz output
 
     - name: Upload build output
       uses: actions/upload-artifact@v3
