@@ -52,5 +52,5 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: app
-        path: output/
+        path: wslpipeproxy-${{ steps.version.outputs.version }}.tar.gz
 
