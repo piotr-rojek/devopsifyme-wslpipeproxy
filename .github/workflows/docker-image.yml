@@ -33,19 +33,19 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }}"
+      run: docker build . --file Dockerfile --tag devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }}
 
     - name: Push Docker image
       if: github.event_name != 'pull_request'
-      run: docker push devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }}"
+      run: docker push devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }}
 
     - name: Tag Docker Image as latest
       if: github.ref == 'refs/heads/main'
       run: |
-        docker tag devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }}" devopsifyme/wslpipeproxy:latest 
-        docker tag devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }}" devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.major }} 
-        docker tag devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }}" devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.major }}.${{ steps.gitversion.outputs.minor }} 
-        docker tag devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }}" devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.majorMinorPatch }}
+        docker tag devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }} devopsifyme/wslpipeproxy:latest 
+        docker tag devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }} devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.major }} 
+        docker tag devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }} devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.major }}.${{ steps.gitversion.outputs.minor }} 
+        docker tag devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }} devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.majorMinorPatch }}
         docker push devopsifyme/wslpipeproxy:latest
         docker push devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.major }} 
         docker push devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.major }}.${{ steps.gitversion.outputs.minor }} 
@@ -53,16 +53,16 @@ jobs:
 
     - name: Archive build output
       run: |
-        docker create --name output devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }}"
+        docker create --name output devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }}
         docker cp output:/install/ output/
         docker container rm output
-        tar -czvf wslpipeproxy-${{ steps.gitversion.outputs.semVer }}".tar.gz output
+        tar -czvf wslpipeproxy-${{ steps.gitversion.outputs.semVer }}.tar.gz output
 
     - name: Upload build output
       uses: actions/upload-artifact@v3
       with:
         name: app
-        path: wslpipeproxy-${{ steps.gitversion.outputs.semVer }}".tar.gz
+        path: wslpipeproxy-${{ steps.gitversion.outputs.semVer }}.tar.gz
 
     - name: Create Release
       #if: github.ref == 'refs/heads/main'
