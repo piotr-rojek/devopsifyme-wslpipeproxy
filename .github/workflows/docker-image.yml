@@ -76,7 +76,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         release_name: v${{ steps.gitversion.outputs.SemVer }}
-        tag_name: ${{ steps.gitversion.outputs.SemVer }}
+        tag_name: v${{ steps.gitversion.outputs.SemVer }}
         draft: true
 
     - name: Upload Release Asset
