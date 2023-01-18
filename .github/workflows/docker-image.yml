@@ -1,0 +1,91 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: write
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}   # checkout the correct branch name
+        fetch-depth: 0                # fetch the whole repo history
+    
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v0.9.7
+      with:
+        versionSpec: '5.x'
+
+    - name: Determine Version
+      id: gitversion
+      uses: gittools/actions/gitversion/execute@v0.9.7
+    
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: devopsifyme
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }}
+
+    - name: Push Docker image
+      if: github.event_name != 'pull_request'
+      run: docker push devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }}
+
+    - name: Tag Docker Image as latest
+      if: github.ref == 'refs/heads/main'
+      run: |
+        docker tag devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }} devopsifyme/wslpipeproxy:latest 
+        docker tag devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }} devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.major }} 
+        docker tag devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }} devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.major }}.${{ steps.gitversion.outputs.minor }} 
+        docker tag devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }} devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.majorMinorPatch }}
+        docker push devopsifyme/wslpipeproxy:latest
+        docker push devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.major }} 
+        docker push devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.major }}.${{ steps.gitversion.outputs.minor }} 
+        docker push devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.majorMinorPatch  }}
+
+    - name: Archive build output
+      run: |
+        docker create --name output devopsifyme/wslpipeproxy:${{ steps.gitversion.outputs.semVer }}
+        docker cp output:/install/ output/
+        docker container rm output
+        tar -czvf wslpipeproxy-${{ steps.gitversion.outputs.semVer }}.tar.gz output
+
+    - name: Upload build output
+      uses: actions/upload-artifact@v3
+      with:
+        name: app
+        path: wslpipeproxy-${{ steps.gitversion.outputs.semVer }}.tar.gz
+
+    - name: Create Release
+      if: github.ref == 'refs/heads/main'
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        release_name: v${{ steps.gitversion.outputs.SemVer }}
+        tag_name: v${{ steps.gitversion.outputs.SemVer }}
+
+    - name: Upload Release Asset
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: wslpipeproxy-${{ steps.gitversion.outputs.semVer }}.tar.gz
+        asset_name: wslpipeproxy-${{ steps.gitversion.outputs.semVer }}.tar.gz
+        asset_content_type: application/tar+gzip
+
