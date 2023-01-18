@@ -1,6 +1,6 @@
 # DevOpsify Me - WSL Pipe Proxy
 
-Tool for exposing unix sockets inside of WSL to Windows application. One popular use case is exposing docker.sock from WSL to docker cli running on Windows. 
+Tool for exposing unix sockets inside of WSL to Windows applications like Docker CLI. One popular use case is exposing docker.sock from WSL to docker cli running on Windows. 
 
 Architecture:
 ```
@@ -16,7 +16,13 @@ Check [DevOpsify Me](https://devopsifyme.com) for more information.
 * Running Docker on WSL, accessing from Windows Host
 * Replacing Docker Desktop, Rancher Desktop
 
-## Usage
+## Installation
+
+We recommend installing as a container - see https://hub.docker.com/r/devopsifyme/wslpipeproxy. Also possible to register as a Windows service `sc.exe create DevOpsifyMeWslPipeProxy binpath= PathToThePublishFolder\wslpipeproxy.exe`.
+
+## Manual installation - docker.sock
+
+> Note that the easiest is to simply run a container https://hub.docker.com/r/devopsifyme/wslpipeproxy. But you are welcome to also run the tool as a Windows service or just straight from command line as shown below.
 
 Prepare your WSL instance, here we assume Ubuntu 22.04. 
 * check if net7 runitme is installed `dotnet --list-runtimes`
@@ -52,7 +58,7 @@ docker context create docker-on-ubuntu2204 --docker host=npipe:////./pipe/docker
 docker context use docker-on-ubuntu2204
 ```
 
-Run the proxy wslpipeproxy.exe
+Run the proxy `wslpipeproxy.exe`, making sure that appsettings.json is in the working directory.
 
 ## Publish
 
@@ -64,8 +70,4 @@ dotnet publish -c Release -p:PublishSingleFile=true --self-contained false
 
 ## Remarks
 
-This is Proof of Concept work at this point. It is possible to run it as a Windows Service, but it currently has no error handling.
-
-```ps
-sc.exe create DevOpsifyMeWslPipeProxy binpath= PathToThePublishFolder\wslpipeproxy.exe
-```
+This is Proof of Concept work at this point - kindly please report any issues found.

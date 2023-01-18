@@ -6,12 +6,11 @@ namespace DevOpsifyMe.WslSocketProxy
 {
     public class PipeServer
     {
-        private const int BufferSize = 10000;
+        private const int BufferSize = 1024*1024;
 
         public event EventHandler? ClientConnected;
         public event EventHandler? ClientDisconnected;
 
-        private StreamWriter _stoutWriter;
         SocatProcessFactory _processFactory;
         private readonly ILogger<PipeServer> _logger;
 
@@ -19,8 +18,6 @@ namespace DevOpsifyMe.WslSocketProxy
         {
             _processFactory = processFactory;
             _logger = logger;
-            var stdout = Console.OpenStandardOutput();
-            _stoutWriter = new StreamWriter(stdout);
         }
 
         public async Task StartAsync(Forwarding forwarding, CancellationToken cancellationToken)
@@ -52,28 +49,21 @@ namespace DevOpsifyMe.WslSocketProxy
 
         protected async Task HandleClientConnectionAsync(Process socatProcess, PipeStream pipeStream, CancellationToken cancellationToken)
         {
-            using var pipeReader = new StreamReader(pipeStream);
-            using var pipeWriter = new StreamWriter(pipeStream)
-            {
-                AutoFlush = true
-            };
-
             var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            var readTask = CopyStreamToAsync(pipeReader, socatProcess.StandardInput, cancellationSource.Token);
-            var writeTask = CopyStreamToAsync(socatProcess.StandardOutput, pipeWriter, cancellationSource.Token);
+            var readTask = CopyStreamToAsync(pipeStream, socatProcess.StandardInput.BaseStream, cancellationSource.Token);
+            var writeTask = CopyStreamToAsync(socatProcess.StandardOutput.BaseStream, pipeStream, cancellationSource.Token);
 
             await Task.WhenAny(readTask, writeTask);
             cancellationSource.Cancel();
         }
 
-        protected async Task CopyStreamToAsync(StreamReader reader, StreamWriter writer, CancellationToken cancellationToken)
+        protected async Task CopyStreamToAsync(Stream reader, Stream writer, CancellationToken cancellationToken)
         {
-            char[] buffer = new char[BufferSize];
+            byte[] buffer = new byte[BufferSize];
             int bytesRead;
             while ((bytesRead = await reader.ReadAsync(buffer, cancellationToken)) > 0)
             {
                 await writer.WriteAsync(buffer[0..bytesRead], cancellationToken);
-                await _stoutWriter.WriteAsync(buffer[0..bytesRead], cancellationToken);
             }
         }
     }

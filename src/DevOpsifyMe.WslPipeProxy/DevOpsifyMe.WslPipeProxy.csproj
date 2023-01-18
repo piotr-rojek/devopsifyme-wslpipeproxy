@@ -7,7 +7,7 @@
     <UserSecretsId>dotnet-wsl_socket_forwarder-f425b0c0-668e-4fa2-a381-154454744b6b</UserSecretsId>
     <RootNamespace>DevOpsifyMe.WslSocketProxy</RootNamespace>
 	  <AssemblyName>wslpipeproxy</AssemblyName>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

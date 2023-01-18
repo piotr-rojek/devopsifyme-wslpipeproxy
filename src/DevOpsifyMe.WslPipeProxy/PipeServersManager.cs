@@ -53,7 +53,7 @@ namespace DevOpsifyMe.WslSocketProxy
                 var server = AddServerAndStart(forwarding, cancellationToken);
 
             };
-            pipeServer.ClientDisconnected += (sender, args) => RemoveServer((PipeServer)sender);
+            pipeServer.ClientDisconnected += (sender, args) => RemoveServer((PipeServer)sender!);
 
             _logger.LogDebug("Created pipe server for distribition {distribution} {unix} <= {npipe}",
                 forwarding.Distribution, forwarding.Unix, forwarding.Npipe);

@@ -1,5 +1,6 @@
 using DevOpsifyMe.WslSocketProxy;
 using DevOpsifyMe.WslSocketProxy.Model;
+using System.Reflection;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
