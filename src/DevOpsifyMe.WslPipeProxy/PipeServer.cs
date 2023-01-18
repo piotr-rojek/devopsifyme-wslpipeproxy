@@ -6,8 +6,6 @@ namespace DevOpsifyMe.WslSocketProxy
 {
     public class PipeServer
     {
-        private const int BufferSize = 1024*1024;
-
         public event EventHandler? ClientConnected;
         public event EventHandler? ClientDisconnected;
 
@@ -50,21 +48,11 @@ namespace DevOpsifyMe.WslSocketProxy
         protected async Task HandleClientConnectionAsync(Process socatProcess, PipeStream pipeStream, CancellationToken cancellationToken)
         {
             var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            var readTask = CopyStreamToAsync(pipeStream, socatProcess.StandardInput.BaseStream, cancellationSource.Token);
-            var writeTask = CopyStreamToAsync(socatProcess.StandardOutput.BaseStream, pipeStream, cancellationSource.Token);
+            var readTask = pipeStream.CopyToAsync(socatProcess.StandardInput.BaseStream, cancellationSource.Token);
+            var writeTask = socatProcess.StandardOutput.BaseStream.CopyToAsync(pipeStream, cancellationSource.Token);
 
             await Task.WhenAny(readTask, writeTask);
             cancellationSource.Cancel();
-        }
-
-        protected async Task CopyStreamToAsync(Stream reader, Stream writer, CancellationToken cancellationToken)
-        {
-            byte[] buffer = new byte[BufferSize];
-            int bytesRead;
-            while ((bytesRead = await reader.ReadAsync(buffer, cancellationToken)) > 0)
-            {
-                await writer.WriteAsync(buffer[0..bytesRead], cancellationToken);
-            }
         }
     }
 }
