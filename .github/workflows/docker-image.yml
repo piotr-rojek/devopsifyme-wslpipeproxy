@@ -29,5 +29,5 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag devopsifyme/wslpipeproxy:${{ steps.version.outputs.version }}
-    - name: Publish Docker image
-      run: docker publish devopsifyme/wslpipeproxy:${{ steps.version.outputs.version }}
+    - name: Push Docker image
+      run: docker push devopsifyme/wslpipeproxy:${{ steps.version.outputs.version }}
