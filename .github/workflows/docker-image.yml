@@ -77,7 +77,6 @@ jobs:
       with:
         release_name: v${{ steps.gitversion.outputs.SemVer }}
         tag_name: v${{ steps.gitversion.outputs.SemVer }}
-        draft: true
 
     - name: Upload Release Asset
       if: github.ref == 'refs/heads/main'
