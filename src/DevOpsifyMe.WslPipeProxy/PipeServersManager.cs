@@ -25,7 +25,7 @@ namespace DevOpsifyMe.WslSocketProxy
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                Task.WaitAny(_knownServers.Values.ToArray());
+                Task.WaitAny(_knownServers.Values.ToArray(), cancellationToken);
 
                 if (_knownServers.Count < MinimumNumberOfServers)
                 {
