@@ -17,8 +17,17 @@ jobs:
       with:
         ref: ${{ github.head_ref }}   # checkout the correct branch name
         fetch-depth: 0                # fetch the whole repo history
+    
     - name: Git Version
       id: version
       uses: codacy/git-version@2.7.1
+    
+    - name: Log in to Docker Hub
+      uses: docker/login-action
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag devopsifyme/wslpipeproxy:${{ steps.version.outputs.version }}
+    - name: Publish Docker image
+      run: docker publish devopsifyme/wslpipeproxy:${{ steps.version.outputs.version }}
