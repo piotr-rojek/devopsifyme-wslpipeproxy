@@ -69,7 +69,7 @@ jobs:
         path: wslpipeproxy-${{ steps.gitversion.outputs.semVer }}.tar.gz
 
     - name: Create Release
-      #if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main'
       id: create_release
       uses: actions/create-release@v1
       env:
@@ -80,6 +80,7 @@ jobs:
         draft: true
 
     - name: Upload Release Asset
+      if: github.ref == 'refs/heads/main'
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
