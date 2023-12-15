@@ -27,11 +27,7 @@ namespace DevOpsifyMe.WslSocketProxy
             _logger.LogInformation("Starting {application}{arguments}", info.FileName, info.Arguments);
 
             var p = Process.Start(info);
-            if (p == null)
-            {
-                throw new ArgumentException("Cannot start wsl / socat");
-            }
-            return p;
+            return p ?? throw new ArgumentException("Cannot start wsl / socat");
         }
     }
 }
