@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    $HostPath = $env:HOST_PATH ?? "/mnt/c/wsipipeproxy",
+    $HostPath = $env:HOST_PATH ?? "/mnt/c/wslpipeproxy",
 
     $ForwardDistribution = $env:F_DISTRIBUTION ?? "Ubuntu-22.04",
     $ForwardNpipe = $env:F_NPIPE ?? "dockerOnWSL" + ($ForwardDistribution -replace '[^\w]',''),
@@ -26,5 +26,6 @@ Write-Host "  docker context use $ForwardNpipe"
 # Execute commands on the host node (WSL), requires priviledged and pid=host
 Set-Location $installPath
 Write-Host "Running application on host in directory: $HostPath"
-$args = " --forwardings:0:distribution $ForwardDistribution --forwardings:0:npipe $ForwardNpipe --forwardings:0:unix $ForwardUnix"
-nsenter -t 1 -m -u -i -n sh -c "cd $HostPath && /mnt/c/wslpipeproxy3/wslpipeproxy.exe $args"
+$parameters = " --forwardings:0:distribution $ForwardDistribution --forwardings:0:npipe $ForwardNpipe --forwardings:0:unix $ForwardUnix"
+Write-Host "Running nsenter -t 1 -m -u -i -n -- sh -c ""cd $HostPath && $HostPath/wslpipeproxy.exe $parameters"""
+nsenter -t 1 -m -u -n -i sh -c "cd $HostPath && $HostPath/wslpipeproxy.exe $parameters"

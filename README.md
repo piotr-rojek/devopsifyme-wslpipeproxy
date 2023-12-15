@@ -20,6 +20,18 @@ Check [DevOpsify Me](https://devopsifyme.com) for more information.
 
 We recommend installing as a container - see https://hub.docker.com/r/devopsifyme/wslpipeproxy. Also possible to register as a Windows service `sc.exe create DevOpsifyMeWslPipeProxy binpath= PathToThePublishFolder\wslpipeproxy.exe`.
 
+### Docker
+Edit settings:
+
+- F_DISTRIBUTION: Default "Ubuntu-22.04"
+- F_NPIPE: Default "dockerOnUbuntu2204"
+- F_UNIX: Default "/run/docker.sock"
+- HOST_PATH: Default "/mnt/c/wslpipeproxy"
+
+```sh
+sudo docker run -d --name wslpipeproxy --env  F_UNIX="" --env  F_NPIPE="" --env F_DISTRIBUTION="" --privileged --pid=host  --restart=always  -v /mnt/c/:/app  devopsifyme/wslpipeproxy
+```
+
 ## Manual installation - docker.sock
 
 > Note that the easiest is to simply run a container https://hub.docker.com/r/devopsifyme/wslpipeproxy. But you are welcome to also run the tool as a Windows service or just straight from command line as shown below.
