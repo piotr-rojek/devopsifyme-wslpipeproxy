@@ -21,11 +21,11 @@ Check [DevOpsify Me](https://devopsifyme.com) for more information.
 We recommend installing as a container - see https://hub.docker.com/r/devopsifyme/wslpipeproxy. Also possible to register as a Windows service `sc.exe create DevOpsifyMeWslPipeProxy binpath= PathToThePublishFolder\wslpipeproxy.exe`.
 
 ### Docker
-Edit the settings:
+Edit settings:
 
 - F_DISTRIBUTION: Default "Ubuntu-22.04"
-- F_NPIPE: Default "dockerOnWSLUbuntu2204"
-- F_UNIX: Default "/run/var/docker.sock"
+- F_NPIPE: Default "dockerOnUbuntu2204"
+- F_UNIX: Default "/run/docker.sock"
 - HOST_PATH: Default "/mnt/c/wslpipeproxy"
 
 ```sh
@@ -57,8 +57,8 @@ Edit appsettings.json and configure fowarding towards your distribution `wsl --l
 "Forwardings": [
     {
       "Distribution": "Ubuntu-22.04",
-      "Npipe": "dockerOnWSLUbuntu2204",
-      "Unix": "/run/var/docker.sock"
+      "Npipe": "dockerOnUbuntu2204",
+      "Unix": "/run/docker.sock"
     }
   ]
 ```
@@ -66,7 +66,7 @@ Edit appsettings.json and configure fowarding towards your distribution `wsl --l
 Then add docker context and activate it
 
 ```ps
-docker context create docker-on-ubuntu2204 --docker host=npipe:////./pipe/dockerOnWSLUbuntu2204
+docker context create docker-on-ubuntu2204 --docker host=npipe:////./pipe/dockerOnUbuntu2204
 docker context use docker-on-ubuntu2204
 ```
 
